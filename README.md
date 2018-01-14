@@ -1,22 +1,37 @@
 # electron-vue
 
-> An electron-vue project
-
 #### Build Setup
 
 ``` bash
 # install dependencies
-npm install
+yarn install
 
 # serve with hot reload at localhost:9080
-npm run dev
+yarn run dev
 
 # build electron application for production
-npm run build
-
+yarn run build
 
 # lint all JS/Vue component files in `src/`
-npm run lint
+yarn run lint
+
+```
+
+#### Packaging
+
+``` bash
+# install electron-packager
+yarn global add electron-packager
+
+# install wine
+brew cask install xquartz
+brew install wine
+
+# build for Windows 32bit
+electron-packager . next-tool-electron --platform=win32 --arch=ia32 --electronVersion=1.7.5 --out 'build' --overwrite
+
+# build for Linux, mac, Windows 64bit
+electron-packager . next-tool-electron --platform=linux,darwin,win32 --arch=x64 --electronVersion=1.7.5 --out 'build' --overwrite
 
 ```
 
