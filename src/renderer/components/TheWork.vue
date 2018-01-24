@@ -27,20 +27,19 @@
       }
     },
     created () {
-      let self = this
-      this.getCheckListDb().count({}, function (_err, count) {
+      this.setCheckListDb()
+      this.getCheckListDb().count({}, (_err, count) => {
         if (count <= 0) {
           // 初回のみデフォルトルールを設定
-          self.insertCheckListDb(self.getDefaultCheckList())
+          this.insertCheckListDb(this.getCheckList())
         }
       })
       this.loadCheckList()
     },
     methods: {
       loadCheckList () {
-        let self = this
-        this.getCheckListDb().find({}).sort({ word: 1 }).exec(function (_err, docs) {
-          self.setDefaultCheckList(docs)
+        this.getCheckListDb().find({}).sort({ word: 1 }).exec((_err, docs) => {
+          this.setCheckList(docs)
         })
       },
       handleChange (file) {
@@ -49,10 +48,9 @@
         const rl = readline.createInterface({ input: stream })
         rl.on('line', (data) => {
           let line = ''
-          let self = this
-          // チェックリストの単語をタグ付きに置換
-          const checkList = this.getDefaultCheckList()
-          Object.keys(checkList).forEach(function (i) {
+          // チェックリストの単語 or 正規表現をタグ付きに置換
+          const checkList = this.getCheckList()
+          Object.keys(checkList).forEach((i) => {
             let word = checkList[i].word
             let replaceData = data.replace(/\r?\n|\s+/g, '')
             if (replaceData.match(new RegExp(word, 'g'))) {
@@ -65,18 +63,19 @@
           })
           // チェックリストの単語を含む行を表示
           if (line) {
-            self.lines.push({'value': line})
-            self.count++
+            this.lines.push({'value': line})
+            this.count++
           }
         })
       },
       ...mapGetters([
         'getCheckListDb',
-        'getDefaultCheckList'
+        'getCheckList'
       ]),
       ...mapActions([
         'insertCheckListDb',
-        'setDefaultCheckList'
+        'setCheckList',
+        'setCheckListDb'
       ])
     }
   }

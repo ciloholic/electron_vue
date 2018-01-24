@@ -22,10 +22,11 @@
 
 <script>
   import { mapGetters, mapActions } from 'vuex'
+
   export default {
     data () {
       return {
-        checkList: null,
+        checkList: this.getCheckList(),
         addWord: ''
       }
     },
@@ -34,14 +35,12 @@
     },
     methods: {
       loadCheckList () {
-        let self = this
-        this.getCheckListDb().find({}).sort({ word: 1 }).exec(function (_err, docs) {
-          self.checkList = docs
+        this.getCheckListDb().find({}).sort({ word: 1 }).exec((_err, docs) => {
+          this.checkList = docs
         })
       },
       resetCheckList () {
-        this.getCheckListDb().remove({}, { multi: true }, function (_err, _numRemoved) {})
-        this.insertCheckListDb(this.getDefaultCheckList())
+        this.resetDefaultCheckList()
         this.loadCheckList()
       },
       createCheckList () {
@@ -50,7 +49,7 @@
         this.addWord = ''
       },
       deleteCheckList (id) {
-        this.getCheckListDb().remove({ _id: id }, function (_err, _numRemoved) {})
+        this.getCheckListDb().remove({ _id: id }, (_err, _numRemoved) => {})
         this.loadCheckList()
       },
       defaultCheck (boot) {
@@ -58,9 +57,10 @@
       },
       ...mapGetters([
         'getCheckListDb',
-        'getDefaultCheckList'
+        'getCheckList'
       ]),
       ...mapActions([
+        'resetDefaultCheckList',
         'insertCheckListDb'
       ])
     }

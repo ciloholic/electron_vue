@@ -1,5 +1,4 @@
 [
-  { "word": "女性", "default": true },
-  { "word": "男性", "default": true },
-  { "word": "SG[0-9]{2}", "default": true }
+  { "word": "サンプル", "default": true },
+  { "word": "[0-9]", "default": true }
 ]
