@@ -21,16 +21,11 @@
 </template>
 
 <script>
-  const path = require('path')
-  const fs = require('fs')
-  const Nedb = require('nedb')
-
+  import { mapGetters, mapActions } from 'vuex'
   export default {
     data () {
       return {
         checkList: null,
-        defaultCheckList: JSON.parse(fs.readFileSync(path.join(__static, '/defaultCheckList.json'), 'utf8')),
-        checkListDb: new Nedb({ filename: path.join(__static, '/checkList.db'), autoload: true }),
         addWord: ''
       }
     },
@@ -40,27 +35,34 @@
     methods: {
       loadCheckList () {
         let self = this
-        this.checkListDb.find({}).sort({ word: 1 }).exec(function (_err, docs) {
+        this.getCheckListDb().find({}).sort({ word: 1 }).exec(function (_err, docs) {
           self.checkList = docs
         })
       },
       resetCheckList () {
-        this.checkListDb.remove({}, { multi: true }, function (_err, _numRemoved) {})
-        this.checkListDb.insert(this.defaultCheckList)
+        this.getCheckListDb().remove({}, { multi: true }, function (_err, _numRemoved) {})
+        this.insertCheckListDb(this.getDefaultCheckList())
         this.loadCheckList()
       },
       createCheckList () {
-        this.checkListDb.insert({ word: this.addWord })
+        this.insertCheckListDb({ word: this.addWord })
         this.loadCheckList()
         this.addWord = ''
       },
       deleteCheckList (id) {
-        this.checkListDb.remove({ _id: id }, function (_err, _numRemoved) {})
+        this.getCheckListDb().remove({ _id: id }, function (_err, _numRemoved) {})
         this.loadCheckList()
       },
       defaultCheck (boot) {
         return typeof (boot) !== 'undefined' && boot === true
-      }
+      },
+      ...mapGetters([
+        'getCheckListDb',
+        'getDefaultCheckList'
+      ]),
+      ...mapActions([
+        'insertCheckListDb'
+      ])
     }
   }
 </script>

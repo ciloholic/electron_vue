@@ -15,26 +15,23 @@
 </template>
 
 <script>
-  const path = require('path')
+  import { mapGetters, mapActions } from 'vuex'
   const fs = require('fs')
   const readline = require('readline')
-  const Nedb = require('nedb')
 
   export default {
     data () {
       return {
-        defaultCheckList: JSON.parse(fs.readFileSync(path.join(__static, '/defaultCheckList.json'), 'utf8')),
-        checkListDb: new Nedb({ filename: path.join(__static, '/checkList.db'), autoload: true }),
         lines: [],
         count: 0
       }
     },
     created () {
       let self = this
-      this.checkListDb.count({}, function (_err, count) {
+      this.getCheckListDb().count({}, function (_err, count) {
         if (count <= 0) {
           // 初回のみデフォルトルールを設定
-          self.checkListDb.insert(self.defaultCheckList)
+          self.insertCheckListDb(self.getDefaultCheckList())
         }
       })
       this.loadCheckList()
@@ -42,8 +39,8 @@
     methods: {
       loadCheckList () {
         let self = this
-        this.checkListDb.find({}).sort({ word: 1 }).exec(function (_err, docs) {
-          self.defaultCheckList = docs
+        this.getCheckListDb().find({}).sort({ word: 1 }).exec(function (_err, docs) {
+          self.setDefaultCheckList(docs)
         })
       },
       handleChange (file) {
@@ -54,7 +51,7 @@
           let line = ''
           let self = this
           // チェックリストの単語をタグ付きに置換
-          const checkList = this.defaultCheckList
+          const checkList = this.getDefaultCheckList()
           Object.keys(checkList).forEach(function (i) {
             let word = checkList[i].word
             let replaceData = data.replace(/\r?\n|\s+/g, '')
@@ -72,7 +69,15 @@
             self.count++
           }
         })
-      }
+      },
+      ...mapGetters([
+        'getCheckListDb',
+        'getDefaultCheckList'
+      ]),
+      ...mapActions([
+        'insertCheckListDb',
+        'setDefaultCheckList'
+      ])
     }
   }
 </script>
