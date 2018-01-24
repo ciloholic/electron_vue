@@ -3,12 +3,14 @@
     <el-upload :on-change="handleChange" action="" :auto-upload="false" :limit="1" :show-file-list="false">
       <el-button size="small" type="success" icon="el-icon-upload">読み込み</el-button>
     </el-upload>
-    <p>{{ count }}件ヒット</p>
-    <ul>
-      <li v-for="line in lines">
-        <span v-html="line"></span>
-      </li>
-    </ul>
+    <p v-if="count > 0">{{ count }}件ヒット</p>
+    <el-table :data="lines" :show-header="false" stripe>
+      <el-table-column prop="value">
+        <template slot-scope="props">
+          <span v-html="props.row['value']"></span>
+        </template>
+      </el-table-column>
+    </el-table>
   </el-main>
 </template>
 
@@ -66,7 +68,7 @@
           })
           // チェックリストの単語を含む行を表示
           if (line) {
-            self.lines.push(line)
+            self.lines.push({'value': line})
             self.count++
           }
         })

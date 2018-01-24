@@ -16,7 +16,7 @@
 
 <script>
   export default {
-    name: 'next-tool-electron'
+    name: 'app'
   }
 </script>
 
